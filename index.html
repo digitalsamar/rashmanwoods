@@ -3,45 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rashman Woods | Shop</title>
+    <title>Rashman Seller | Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .active-tab { background: #ecfdf5; border-left: 4px solid #059669; color: #059669; }
     </style>
 </head>
-<body class="bg-gray-50">
-    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b p-4 flex justify-between items-center">
-        <h1 class="text-xl font-extrabold text-emerald-800">RASHMAN <span class="text-slate-800 text-sm font-normal">WOODS</span></h1>
-        <button onclick="openCart()" class="relative p-2 bg-emerald-50 rounded-full">
-            <i data-lucide="shopping-cart" class="text-emerald-700"></i>
-            <span id="cartCount" class="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">0</span>
-        </button>
-    </nav>
+<body class="bg-[#f8fafc]">
+    <div class="flex h-screen overflow-hidden">
+        <aside class="w-72 bg-white border-r hidden md:flex flex-col">
+            <div class="p-6"><h1 class="text-2xl font-bold text-emerald-700">Rashman Admin</h1></div>
+            <nav class="flex-1 px-4 space-y-2">
+                <button onclick="showTab('dash')" class="w-full flex items-center gap-3 p-3 rounded-lg active-tab"><i data-lucide="bar-chart"></i> Dashboard</button>
+                <button onclick="showTab('products')" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50"><i data-lucide="package"></i> Inventory</button>
+                <button onclick="showTab('orders')" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50"><i data-lucide="shopping-bag"></i> Orders</button>
+            </nav>
+        </aside>
 
-    <header class="p-4">
-        <div class="bg-emerald-900 rounded-3xl p-6 text-white animate__animated animate__fadeIn">
-            <h2 class="text-3xl font-bold mb-1">Pure Organic</h2>
-            <p class="text-emerald-200 text-sm">Traditional woods & Cow dung cakes for all religious needs.</p>
-        </div>
-    </header>
+        <main class="flex-1 overflow-y-auto p-8">
+            <div id="dash" class="tab-content animate__animated animate__fadeIn">
+                <h2 class="text-3xl font-bold mb-6">Store Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stats-container">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border">
+                        <p class="text-slate-400">Active Products</p>
+                        <h3 id="stat-products" class="text-2xl font-bold">0</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border">
+                        <p class="text-slate-400">Total Orders</p>
+                        <h3 id="stat-orders" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+            </div>
 
-    <main class="p-4 grid grid-cols-1 md:grid-cols-3 gap-4" id="productGrid"></main>
+            <div id="products" class="tab-content hidden animate__animated animate__fadeIn">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold">Inventory</h2>
+                    <button onclick="document.getElementById('pModal').classList.remove('hidden')" class="bg-emerald-600 text-white px-4 py-2 rounded-xl">+ Add Product</button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b">
+                            <tr><th class="p-4">Name</th><th class="p-4">Price</th><th class="p-4">Stock</th><th class="p-4">Actions</th></tr>
+                        </thead>
+                        <tbody id="inventoryList"></tbody>
+                    </table>
+                </div>
+            </div>
 
-    <div id="cartSidebar" class="fixed inset-y-0 right-0 w-80 bg-white shadow-2xl z-[60] transform translate-x-full transition-transform p-6">
-        <div class="flex justify-between mb-6"><h2 class="text-2xl font-bold">Your Cart</h2><button onclick="openCart()"><i data-lucide="x"></i></button></div>
-        <div id="cartItems" class="space-y-4 mb-6"></div>
-        <div class="border-t pt-4">
-            <div class="flex justify-between font-bold text-lg mb-4"><span>Total:</span><span id="cartTotal">₹0</span></div>
-            <button onclick="placeOrder()" class="w-full bg-emerald-700 text-white py-4 rounded-2xl font-bold shadow-lg shadow-emerald-200">Checkout Now</button>
+            <div id="orders" class="tab-content hidden animate__animated animate__fadeIn">
+                <h2 class="text-3xl font-bold mb-6">Recent Orders</h2>
+                <div id="orderList" class="space-y-4"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="pModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4">Add New Item</h3>
+            <div class="space-y-4">
+                <input id="pName" type="text" placeholder="Product Name" class="w-full p-3 border rounded-xl">
+                <input id="pPrice" type="number" placeholder="Price (₹)" class="w-full p-3 border rounded-xl">
+                <input id="pStock" type="number" placeholder="Stock Quantity" class="w-full p-3 border rounded-xl">
+                <input id="pUrl" type="text" placeholder="Image URL" class="w-full p-3 border rounded-xl">
+                <button onclick="saveProduct()" class="w-full bg-emerald-600 text-white p-3 rounded-xl font-bold">Upload to Store</button>
+                <button onclick="document.getElementById('pModal').classList.add('hidden')" class="w-full text-gray-400">Cancel</button>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA7ZBVZYljW1NJGIo5DmQeBfXsoUb9_0kY",
@@ -55,53 +91,54 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        let cart = [];
+
+        window.saveProduct = () => {
+            const data = {
+                name: document.getElementById('pName').value,
+                price: document.getElementById('pPrice').value,
+                stock: document.getElementById('pStock').value,
+                url: document.getElementById('pUrl').value
+            };
+            push(ref(db, 'products'), data).then(() => {
+                document.getElementById('pModal').classList.add('hidden');
+                alert("Product Added!");
+            });
+        };
 
         onValue(ref(db, 'products'), (snap) => {
-            const grid = document.getElementById('productGrid');
-            grid.innerHTML = '';
+            const list = document.getElementById('inventoryList');
+            list.innerHTML = '';
+            let count = 0;
             snap.forEach(child => {
+                count++;
                 const p = child.val();
-                grid.innerHTML += `
-                <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm animate__animated animate__fadeInUp">
-                    <img src="${p.url}" class="h-48 w-full object-cover rounded-2xl mb-4">
-                    <h3 class="font-bold text-lg">${p.name}</h3>
-                    <p class="text-emerald-700 font-extrabold text-xl mb-4">₹${p.price}</p>
-                    <button onclick="addToCart('${p.name}', ${p.price})" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold">+ Add to Cart</button>
-                </div>`;
+                list.innerHTML += `<tr class="border-b"><td class="p-4 font-bold">${p.name}</td><td class="p-4 text-emerald-600">₹${p.price}</td><td class="p-4">${p.stock}</td><td class="p-4"><button class="text-red-500" onclick="deleteItem('${child.key}')">Delete</button></td></tr>`;
             });
+            document.getElementById('stat-products').innerText = count;
         });
 
-        window.addToCart = (name, price) => {
-            cart.push({name, price});
-            document.getElementById('cartCount').innerText = cart.length;
+        onValue(ref(db, 'orders'), (snap) => {
+            const container = document.getElementById('orderList');
+            container.innerHTML = '';
+            let count = 0;
+            snap.forEach(child => {
+                count++;
+                const o = child.val();
+                container.innerHTML += `<div class="bg-white p-4 rounded-xl border">
+                    <p class="font-bold text-sm">Order #${child.key.slice(-5)}</p>
+                    <p class="text-xs text-gray-500">${o.phone}</p>
+                    <p class="text-emerald-700 font-bold">Total: ₹${o.total}</p>
+                </div>`;
+            });
+            document.getElementById('stat-orders').innerText = count;
+        });
+
+        window.showTab = (id) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
         };
 
-        window.openCart = () => {
-            const sidebar = document.getElementById('cartSidebar');
-            sidebar.classList.toggle('translate-x-full');
-            const list = document.getElementById('cartItems');
-            list.innerHTML = '';
-            let total = 0;
-            cart.forEach(item => {
-                total += parseInt(item.price);
-                list.innerHTML += `<div class="flex justify-between text-sm"><p>${item.name}</p><b>₹${item.price}</b></div>`;
-            });
-            document.getElementById('cartTotal').innerText = '₹' + total;
-        };
-
-        window.placeOrder = () => {
-            if(cart.length === 0) return alert("Cart is empty");
-            const phone = prompt("Enter delivery phone number:");
-            if(!phone) return;
-            const total = cart.reduce((s, i) => s + parseInt(i.price), 0);
-            push(ref(db, 'orders'), { items: cart, total, phone, timestamp: Date.now() })
-            .then(() => {
-                alert("Order Placed Successfully!");
-                cart = [];
-                location.reload();
-            });
-        };
+        window.deleteItem = (key) => remove(ref(db, 'products/' + key));
 
         lucide.createIcons();
     </script>
